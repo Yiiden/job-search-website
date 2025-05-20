@@ -1,12 +1,6 @@
-from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import JobViewSet
+from apps.jobs.views import JobOpeningViewSet
 
 router = DefaultRouter()
-router.register(r'', JobViewSet)
-
-app_name = 'jobs'
-
-urlpatterns = [
-    path('', include(router.urls)),
-] 
+router.register(r'', JobOpeningViewSet, basename='job')  # 不加 'jobs'
+urlpatterns = router.urls

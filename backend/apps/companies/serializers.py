@@ -1,14 +1,49 @@
 from rest_framework import serializers
-from .models import Company
+from .models import Company, CompanyBenefit, StatutoryBenefit, OtherBenefit, Contact, CompanyWebsite, CompanyMedia, CompanyPhoto 
 
-class CompanySerializer(serializers.ModelSerializer):
-    logo_url = serializers.SerializerMethodField()
+class StatutoryBenefitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StatutoryBenefit
+        fields = ['id', 'benefit']
+
+class OtherBenefitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OtherBenefit
+        fields = ['id', 'benefit']
+
+class CompanyBenefitSerializer(serializers.ModelSerializer):
+    statutory = StatutoryBenefitSerializer(many=True, read_only=True)
+    others = OtherBenefitSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Company
-        fields = ['id', 'name', 'description', 'industry', 'location', 'website', 'logo', 'logo_url', 'created_at']
+        model = CompanyBenefit
+        fields = ['id', 'benefits_description', 'statutory', 'others']
 
-    def get_logo_url(self, obj):
-        if obj.logo:
-            return self.context['request'].build_absolute_uri(obj.logo.url)
-        return None 
+class CompanyContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = '__all__'
+
+class CompanyWebsiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyWebsite
+        fields = '__all__'
+
+class CompanyPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyPhoto
+        fields = ['image']
+
+class CompanyMediaSerializer(serializers.ModelSerializer):
+    photos = CompanyPhotoSerializer(many=True, read_only=True)
+    class Meta:
+        model = CompanyMedia
+        fields = ['logo']
+
+class CompanySerializer(serializers.ModelSerializer):
+    benefits = CompanyBenefitSerializer(many=True, read_only=True)
+    contacts = CompanyContactSerializer(many=True, read_only=True)
+    websites = CompanyWebsiteSerializer(many=True, read_only=True)
+    class Meta:
+        model = Company
+        fields = '__all__'
